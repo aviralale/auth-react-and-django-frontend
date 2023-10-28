@@ -12,6 +12,9 @@ import Dashboard from './pages/Dashboard';
 import ResetPasswordPage from './pages/ResetPasswordPage';
 import ActivatedAccountPage from './pages/ActivatedAccountPage';
 import ActivatePage from './pages/ActivatePage';
+import { Toaster } from 'sonner';
+import NotFoundPage from './pages/NotFoundPage';
+import ResetPasswordPageConfirm from './pages/ResetPasswordPageConfirm';
 export default function App() {
   return (
     <div className="flex flex-col justify-center items-center" style={{
@@ -20,14 +23,17 @@ export default function App() {
   }}>
       <BrowserRouter>
       <Navbar/>
+      <Toaster richColors position="bottom-right" />
       <Routes>
         <Route path="/" element={<HomePage />} />
         <Route path="/login" element={<LoginPage />} />
         <Route path="/register" element={<RegisterPage />} />
-        <Route path="/activated-user" element={<ActivatedAccountPage/> } />
-        <Route path="/activate" element={<ActivatePage/> } />
+        <Route path="/activate/:uid/:token" element={<ActivatePage/> } />
+        <Route path="/activated" element={<ActivatedAccountPage/> } />
         <Route path="/reset-password" element={<ResetPasswordPage />} />
+        <Route path="/password/reset/confirm/:uid/:token" element={<ResetPasswordPageConfirm />} />
         <Route path="/dashboard" element={<Dashboard />} />
+        <Route path="*" element={<NotFoundPage/> } />
       </Routes>
       </BrowserRouter>
     </div>

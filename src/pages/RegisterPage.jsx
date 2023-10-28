@@ -1,47 +1,83 @@
 import React from "react";
 import { useEffect, useState } from "react";
-import { Toaster, toast } from 'sonner'
+import { toast } from "sonner";
+import { useDispatch, useSelector } from "react-redux";
+import { register } from "../features/auth/authSlice";
+import {useNavigate} from "react-router-dom"
 
 export default function RegisterPage() {
   const [formData, setFormData] = useState({
-    "first_name": "",
-    "last_name": "",
-    "email": "",
-    "password": "",
-    "re_password": "",
+    first_name: "",
+    last_name: "",
+    email: "",
+    password: "",
+    re_password: "",
   });
 
-  const {
-    first_name,
-    last_name,
-    email,
-    password,
-    re_password,
-  } = formData;
+  const { first_name, last_name, email, password, re_password } = formData;
+
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+
+  const { user, isLoading, isError, isSuccess, message } = useSelector(
+    (state) => state.auth
+  );
 
   const handleChange = (e) => {
-    setFormData( (prev) => ({
-        ...prev,
-        [e.target.name]: e.target.value
-  }))
-  }
+    setFormData((prev) => ({
+      ...prev,
+      [e.target.name]: e.target.value,
+    }));
+  };
 
   const handleSubmit = (e) => {
     e.preventDefault();
 
-    if(password != re_password){
-        toast.error("Passwords don't match.")
+    if (password != re_password) {
+      toast.error("Passwords don't match.");
+    } else {
+      const userData = {
+        first_name,
+        last_name,
+        email,
+        password,
+        re_password
+      }
+      dispatch(register(userData));
     }
-  }
+  };
+
+
+
+
+  useEffect(() => {
+    if (isError) {
+      toast.error(message);
+    }
+  }, [isError, message]);
+  
+  useEffect(() => {
+    if (isSuccess || user) {
+      console.log("Success useEffect triggered");
+      navigate("/");
+      toast.success("An activation email has been sent to your email. Please check your email.");
+    }
+  }, [isSuccess, user]);
+  
+
+
+
 
 
   return (
     <div>
-        <Toaster richColors position="bottom-right" />
       <h1 className="text-8xl text-center uppercase font-bold">Register</h1>
-      <form className="mt-8 flex flex-col justify-center" style={{
-        width: '50vw',
-    }}>
+      <form
+        className="mt-8 flex flex-col justify-center"
+        style={{
+          width: "50vw",
+        }}
+      >
         <input
           type="text"
           className="input mt-2 input-bordered"
@@ -92,7 +128,13 @@ export default function RegisterPage() {
           placeholder="Repeat Password"
           required
         />
-        <button className="btn mt-2 uppercase btn-outline" type="submit" onClick={handleSubmit}>Register</button>
+        <button
+          className="btn mt-2 uppercase btn-outline"
+          type="submit"
+          onClick={handleSubmit}
+        >
+          Register
+        </button>
       </form>
     </div>
   );

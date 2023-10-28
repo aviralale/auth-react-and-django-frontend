@@ -1,6 +1,9 @@
 import { useEffect,useState } from 'react'
 import React from 'react'
-import { Toaster, toast } from 'sonner'
+import { useNavigate } from 'react-router-dom'
+import { useDispatch,useSelector } from 'react-redux'
+import { toast } from 'sonner'
+import { resetPassword } from '../features/auth/authSlice'
 
 export default function ResetPasswordPage() {
     const [formData,setFormData] = useState({
@@ -8,6 +11,12 @@ export default function ResetPasswordPage() {
     })
     const {email
 } = formData;
+
+const dispatch = useDispatch();
+const navigate = useNavigate();
+
+const {isLoading,isError,isSuccess,message} = useSelector((state) => state.auth)
+
 const handleChange = (e) =>{
     setFormData( (prev)=> ({
         ...prev,
@@ -16,18 +25,32 @@ const handleChange = (e) =>{
 }
 const handleSubmit = (e) =>{
     e.preventDefault();
+
+    const userData = {
+      email
+    }
+    dispatch(resetPassword(userData))
+
     if (!email) {
         
         toast.error("Enter a valid email");
     }
-    else{
-        toast("Email sent successfully. Please check your inbox.");
-    }
 }
+
+useEffect(() => {
+  if (isError){
+    toast.error(message)
+    }
+    if (isSuccess) {
+      navigate("/")
+      toast.success("Reset password link has been sent to your mail.")
+    }
+    },[isError,isSuccess,message,navigate,dispatch])
+
   return (
     <div>
-        <Toaster richColors position="bottom-right" />
       <h1 className="text-8xl text-center uppercase font-bold">Reset Password</h1>
+      {isLoading && <p className='text-center uppercase font-bold'>Loading...</p>}
       <form className="mt-8 flex flex-col justify-center" style={{
         width: '50vw',
     }}>
